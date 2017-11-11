@@ -41,7 +41,7 @@ Usage:
   tar_ls            | Prints the contents of an archive. Verbosity level changes what is printed.
   tar_extract       | Extracts the contents of an archive. A filter list can be provided to only extract certain files.
   tar_update        | Scans through the current working directory and appends any files that are updates of archive entries.
-  tar_remove        | Given a list of, removes those entries from the archive.
+  tar_remove        | Given a list of entries, removes those entries from the archive.
   tar_diff          | Checks for differences between entries in the archive and the current working directory.
 
   Many of these functions are just wrappers around internal functions.
