@@ -26,6 +26,8 @@ THE SOFTWARE
 #ifndef __TAR__
 #define __TAR__
 
+#define _BSD_SOURCE
+
 #include <errno.h>
 #include <stdarg.h>
 #include <stdio.h>
