@@ -723,14 +723,18 @@ int extract_entry(const int fd, struct tar_t * entry, const char verbosity){
     if ((entry -> type == REGULAR) || (entry -> type == NORMAL) || (entry -> type == CONTIGUOUS)){
         // create intermediate directories
         size_t len = strlen(entry -> name);
+        if (!len)
+        {
+            V_PRINT(stderr, "Error: Attempted to extract entry with empty name\n");
+            return -1;
+        }
+
         char * path = calloc(len + 1, sizeof(char));
         strncpy(path, entry -> name, len);
 
         // remove file from path
-        if (len > 0){
-            while (--len && (path[len] != '/'));
-            path[len] = '\0';   // if nothing was found, path is terminated
-        }
+        while (--len && (path[len] != '/'));
+        path[len] = '\0';   // if nothing was found, path is terminated
 
         if (recursive_mkdir(path, DEFAULT_DIR_MODE, verbosity) < 0){
             V_PRINT(stderr, "Error: Could not make directory %s\n", path);
