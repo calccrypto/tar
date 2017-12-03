@@ -727,8 +727,10 @@ int extract_entry(const int fd, struct tar_t * entry, const char verbosity){
         strncpy(path, entry -> name, len);
 
         // remove file from path
-        while (--len && (path[len] != '/'));
-        path[len] = '\0';   // if nothing was found, path is terminated
+        if (len > 0){
+            while (--len && (path[len] != '/'));
+            path[len] = '\0';   // if nothing was found, path is terminated
+        }
 
         if (recursive_mkdir(path, DEFAULT_DIR_MODE, verbosity) < 0){
             V_PRINT(stderr, "Error: Could not make directory %s\n", path);
