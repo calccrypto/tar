@@ -167,28 +167,4 @@ int write_end_data(const int fd, int size, const char verbosity);
 int check_match(struct tar_t * entry, const size_t filecount, const char * bad, const char * files[]);
 // /////////////////////////////////////////////////////////////////////////////
 
-// other functions (don't call from outside) ///////////////////////////////////
-#define MIN(x, y) (((x) < (y)) ? (x) : (y))
-#define MAX(x, y) (((x) > (y)) ? (x) : (y))
-#define V_PRINT(f, ...) { if (verbosity) fprintf(f, __VA_ARGS__); }
-#define RC_ERROR(f, ...) const int rc = errno; V_PRINT(f, __VA_ARGS__); return -1;
-#define WRITE_ERROR(f, ...) { V_PRINT(f, __VA_ARGS__); tar_free(*tar); *tar = NULL; return -1; }
-#define EXIST_ERROR(f, ...) const int rc = errno; if (rc != EEXIST) { V_PRINT(f, __VA_ARGS__); return -1; }
-
-// force read() to complete
-int read_size(int fd, char * buf, int size);
-
-// force write() to complete
-int write_size(int fd, char * buf, int size);
-
-// convert octal string to unsigned integer
-unsigned int oct2uint(char * oct, unsigned int size);
-
-// check if a buffer is zeroed
-int iszeroed(char * buf, size_t size);
-
-// make directory recursively
-int recursive_mkdir(const char * dir, const unsigned int mode, const char verbosity);
-// /////////////////////////////////////////////////////////////////////////////
-
 #endif

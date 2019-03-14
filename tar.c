@@ -1,5 +1,27 @@
 #include "tar.h"
 
+#define MIN(x, y) (((x) < (y)) ? (x) : (y))
+#define MAX(x, y) (((x) > (y)) ? (x) : (y))
+#define V_PRINT(f, ...) { if (verbosity) fprintf(f, __VA_ARGS__); }
+#define RC_ERROR(f, ...) const int rc = errno; V_PRINT(f, __VA_ARGS__); return -1;
+#define WRITE_ERROR(f, ...) { V_PRINT(f, __VA_ARGS__); tar_free(*tar); *tar = NULL; return -1; }
+#define EXIST_ERROR(f, ...) const int rc = errno; if (rc != EEXIST) { V_PRINT(f, __VA_ARGS__); return -1; }
+
+// force read() to complete
+static int read_size(int fd, char * buf, int size);
+
+// force write() to complete
+static int write_size(int fd, char * buf, int size);
+
+// convert octal string to unsigned integer
+static unsigned int oct2uint(char * oct, unsigned int size);
+
+// check if a buffer is zeroed
+static int iszeroed(char * buf, size_t size);
+
+// make directory recursively
+static int recursive_mkdir(const char * dir, const unsigned int mode, const char verbosity);
+
 int tar_read(const int fd, struct tar_t ** archive, const char verbosity){
     if (fd < 0){
         return -1;
