@@ -26,7 +26,7 @@ THE SOFTWARE
 #ifndef __TAR__
 #define __TAR__
 
-#define _BSD_SOURCE
+#define _DEFAULT_SOURCE
 
 #include <errno.h>
 #include <stdarg.h>
@@ -38,6 +38,7 @@ THE SOFTWARE
 #include <dirent.h>
 #include <fcntl.h>
 #include <grp.h>
+#include <sys/sysmacros.h>
 #include <sys/select.h>
 #include <sys/stat.h>
 #include <sys/time.h>
