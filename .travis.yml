@@ -1,0 +1,38 @@
+# from <https://github.com/taocpp/PEGTL/blob/master/.travis.yml>
+
+language: c
+
+os: linux
+sudo: true
+
+env:
+    - C_COMPILER=gcc-4.9
+    - C_COMPILER=gcc-5
+    - C_COMPILER=gcc-6
+    - C_COMPILER=gcc-7
+    - C_COMPILER=gcc-8
+    - C_COMPILER=clang-3.8
+    - C_COMPILER=clang-3.9
+    - C_COMPILER=clang-4.0
+    - C_COMPILER=clang-5.0
+    - C_COMPILER=clang-6.0
+    - C_COMPILER=clang-7
+    - C_COMPILER=clang-8
+
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    update: false
+
+before_install:
+  - if [[ "${C_COMPILER}" =~ "clang" ]]; then wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -; sudo apt-add-repository "deb http://apt.llvm.org/xenial/ llvm-toolchain-$(lsb_release -c | awk '{printf $2}')-${C_COMPILER##*-} main" -y; fi
+  - sudo apt-get update
+  - sudo apt-get install "${C_COMPILER}" $(if [[ "${C_COMPILER}" =~ "clang-" ]]; then echo llvm; fi) -y
+
+before_script:
+  - export CC="${C_COMPILER}"
+
+script:
+  - make
+  - sudo make test

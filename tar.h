@@ -38,6 +38,7 @@ THE SOFTWARE
 #include <dirent.h>
 #include <fcntl.h>
 #include <grp.h>
+#include <pwd.h>
 #include <sys/sysmacros.h>
 #include <sys/select.h>
 #include <sys/stat.h>
@@ -76,7 +77,7 @@ struct tar_t {
                 char gid[8];                // group id (octal)
                 char size[12];              // size (octal)
                 char mtime[12];             // modification time (octal)
-                char check[8];              // sum of unsigned characters in block block, with spaces in the check field while calculation is done (octal)
+                char check[8];              // sum of unsigned characters in block, with spaces in the check field while calculation is done (octal)
                 char link;                  // link indicator
                 char link_name[100];        // name of linked file
             };
@@ -150,7 +151,7 @@ unsigned int calculate_checksum(struct tar_t * entry);
 
 // print single entry
 // verbosity should be greater than 0
-int ls_entry(FILE * f, struct tar_t * archive, unsigned int * max_space, const size_t filecount, const char * files[], const char verbosity);
+int ls_entry(FILE * f, struct tar_t * archive, const size_t filecount, const char * files[], const char verbosity);
 
 // extracts a single entry
 // expects file descriptor offset to already be set to correct location

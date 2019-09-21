@@ -51,8 +51,8 @@ int main(int argc, char * argv[]){
                         "        a - append files to archive\n"\
                         "        c - create a new archive\n"\
                         "        d - diff the tar file with the workding directory\n"\
-                        "        l - list the files in the directory\n"\
                         "        r - remove files from the directory\n"\
+                        "        t - list the files in the directory\n"\
                         "        u - update entries that have newer modification times\n"\
                         "        x - extract from archive\n"\
                         "\n"\
@@ -70,8 +70,8 @@ int main(int argc, char * argv[]){
     char a = 0,             // append
          c = 0,             // create
          d = 0,             // diff
-         l = 0,             // list
          r = 0,             // remove
+         t = 0,             // list
          u = 0,             // update
          x = 0;             // extract
     char verbosity = 0;     // 0: no print; 1: print file names; 2: print file properties
@@ -82,11 +82,11 @@ int main(int argc, char * argv[]){
             case 'a': a = 1; break;
             case 'c': c = 1; break;
             case 'd': d = 1; break;
-            case 'l': l = 1; break;
             case 'r': r = 1; break;
+            case 't': t = 1; break;
             case 'u': u = 1; break;
             case 'x': x = 1; break;
-            case 'v': verbosity = 1; break;
+            case 'v': verbosity++; break;
             case '-': break;
             default:
                 fprintf(stderr, "Error: Bad option: %c\n", argv[1][i]);
@@ -97,7 +97,7 @@ int main(int argc, char * argv[]){
     }
 
     // make sure only one of these options was selected
-    const char used = a + c + d + l + r + u + x;
+    const char used = a + c + d + r + t + u + x;
     if (used > 1){
         fprintf(stderr, "Error: Cannot have so all of these flags at once\n");
         return -1;
@@ -132,17 +132,17 @@ int main(int argc, char * argv[]){
         }
 
         // read in data
-        if (tar_read(fd, &archive, 0) < 0){
+        if (tar_read(fd, &archive, verbosity) < 0){
             tar_free(archive);
-            close(fd);          // don't bother checking for fd < 0
+            close(fd);
             return -1;
         }
 
         // perform operation
         if ((a && (tar_write(fd, &archive, argc, files, verbosity) < 0))          ||  // append
             (d && (tar_diff(stdout, archive, verbosity) < 0))                     ||  // diff with current working directory
-            (l && (tar_ls(stdout, archive, argc, files, verbosity + 1) < 0))      ||  // list entries
             (r && (tar_remove(fd, &archive, argc, files, verbosity) < 0))         ||  // remove entries
+            (t && (tar_ls(stdout, archive, argc, files, verbosity + 1) < 0))      ||  // list entries
             (u && (tar_update(fd, &archive, argc, files, verbosity) < 0))         ||  // update entries
             (x && (tar_extract(fd, archive, argc, files, verbosity) < 0))             // extract entries
             ){
