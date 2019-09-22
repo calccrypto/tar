@@ -8,7 +8,7 @@
 #define ERROR(fmt, ...) fprintf(stderr, "Error: " fmt "\n", ##__VA_ARGS__); return -1;
 // capture errno when erroring
 #define RC_ERROR(fmt, ...) const int rc = errno; ERROR(fmt, ##__VA_ARGS__); return -1;
-#define WRITE_ERROR(fmt, ...) { ERROR(fmt, ##__VA_ARGS__); tar_free(*tar); *tar = NULL; return -1; }
+#define WRITE_ERROR(fmt, ...) { ERROR(fmt, ##__VA_ARGS__); tar_free(*archive); *archive = NULL; return -1; }
 #define EXIST_ERROR(fmt, ...) const int rc = errno; if (rc != EEXIST) { ERROR(fmt, ##__VA_ARGS__); return -1; }
 
 // force read() to complete
@@ -49,7 +49,6 @@ int tar_read(const int fd, struct tar_t ** archive, const char verbosity){
             *tar = NULL;
             break;
         }
-
 
         update = 1;
         // if current block is all zeros
@@ -135,8 +134,7 @@ int tar_write(const int fd, struct tar_t ** archive, const size_t filecount, con
 
     // write entries first
     if (write_entries(fd, tar, archive, filecount, files, &offset, verbosity) < 0){
-        V_PRINT(stderr, "Error: Failed to write entries");
-        return -1;
+        WRITE_ERROR("Failed to write entries");
     }
 
     // write ending data
@@ -842,8 +840,6 @@ int write_entries(const int fd, struct tar_t ** archive, struct tar_t ** head, c
 
     // add new data
     struct tar_t ** tar = archive;  // current entry
-
-    char buf[512];                  // one block buffer
     for(unsigned int i = 0; i < filecount; i++){
         *tar = malloc(sizeof(struct tar_t));
 
@@ -854,7 +850,7 @@ int write_entries(const int fd, struct tar_t ** archive, struct tar_t ** head, c
 
         (*tar) -> begin = *offset;
 
-        // write different data depending on file type
+        // directories need special handling
         if ((*tar) -> type == DIRECTORY){
             // save parent directory name (source will change)
             const size_t len = strlen((*tar) -> name);
@@ -905,6 +901,8 @@ int write_entries(const int fd, struct tar_t ** archive, struct tar_t ** head, c
             closedir(d);
 
             free(parent);
+
+            tar = &((*tar) -> next);
         }
         else{ // if (((*tar) -> type == REGULAR) || ((*tar) -> type == NORMAL) || ((*tar) -> type == CONTIGUOUS) || ((*tar) -> type == SYMLINK) || ((*tar) -> type == CHAR) || ((*tar) -> type == BLOCK) || ((*tar) -> type == FIFO)){
             V_PRINT(stdout, "Writing %s", (*tar) -> name);
@@ -944,6 +942,7 @@ int write_entries(const int fd, struct tar_t ** archive, struct tar_t ** head, c
                     }
 
                     int r = 0;
+                    char buf[512];
                     while ((r = read_size(f, buf, 512)) > 0){
                         if (write_size(fd, buf, r) != r){
                             RC_ERROR("Could not write to archive: %s", strerror(rc));
