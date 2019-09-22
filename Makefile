@@ -1,5 +1,5 @@
 CC?=gcc
-CFLAGS=-Wall -std=c11
+CFLAGS=-Wall -std=c99
 LFLAGS=
 TARGET=libtar.a
 AR=ar
@@ -18,50 +18,50 @@ exec: $(TARGET) main.c
 	$(CC) $(CFLAGS) main.c -o exec -ltar -L.
 
 test: exec
-	@# create fake directory entries
-	touch file
-	mkdir folder
-	touch folder/a
-	mkfifo pipe
-	ln -s file sym
-	mknod block b 1 2
-	mknod char c 3 4
+	@echo "create fake directory entries"
+	@touch file
+	@mkdir folder
+	@touch folder/a
+	@mkfifo pipe
+	@ln -s file sym
+	@mknod block b 1 2
+	@mknod char c 3 4
 
-	@# archive the files with tar
-	tar -cf test.tar file folder pipe sym block char char block sym pipe folder file
+	@echo "archive the files with GNU tar"
+	@tar -cf test.tar file folder pipe sym block char char block sym pipe folder file
 
-	@# remove data
-	rm -r file folder pipe sym block char
+	@echo "remove original directory entries"
+	@rm -r file folder pipe sym block char
 
-	@# test extraction
-	./exec x test.tar
+	@echo "test extraction with tarball created by GNU tar"
+	@./exec x test.tar || (echo "fail" && exit 1)
 
-	@# archive the files
-	./exec c test.tar file folder pipe sym block char char block sym pipe folder file
+	@echo "test archive"
+	@./exec c test.tar file folder pipe sym block char char block sym pipe folder file || (echo "fail" && exit 1)
 
-	@# remove entries from archive
-	./exec r test.tar folder/ block
+	@echo "remove entries from tarball"
+	@./exec r test.tar folder/ block || (echo "fail" && exit 1)
 
-	@# diff real tar and this tar
-	tar -vtf test.tar > real
-	./exec tv test.tar > out
-	diff -bu real out
+	@echo "diff tar -t and exec -t"
+	@tar -vtf test.tar > real
+	@./exec tv test.tar > out
+	@diff -bu real out || (echo "fail" && exit 1)
 	@rm -f real out
 
-	@# put them back
-	./exec a test.tar block folder/
+	@echo "restore removed entries"
+	@./exec a test.tar block folder/ || (echo "fail" && exit 1)
 
-	@# diff real tar and this tar
-	tar -vtf test.tar > real
-	./exec tv test.tar > out
-	diff -bu real out
+	@echo "diff tar -t and exec -t"
+	@tar -vtf test.tar > real
+	@./exec tv test.tar > out
+	@diff -bu real out || (echo "fail" && exit 1)
 	@rm real out
 
-	@# extract the files with tar
-	tar -xf test.tar
+	@echo "extract the files with GNU tar"
+	@tar -xf test.tar || (echo "fail" && exit 1)
 
-	@# clean up
-	$(MAKE) clean-test
+	@echo "clean up"
+	@$(MAKE) clean-test
 
 clean-test:
 	rm -rf test.tar char block sym pipe folder file real out

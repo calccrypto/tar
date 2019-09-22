@@ -13,7 +13,8 @@ small subset that are provided by GNU Tar. Everything was written
 based on Wikipedia and the observed results of GNU Tar.
 
 This only works on Linux (or Linux-like environment, such as cygwin)
-due to the sheer number of POSIX header files being used.
+due to the sheer number of POSIX header files being used. The minimum
+C standard needed is C99.
 
 The purpose of this is to be a tar library that can be used
 inside other programs, so that programs don't have to call
