@@ -562,7 +562,7 @@ int format_tar_data(struct tar_t * entry, const char * filename, const char verb
     snprintf(entry -> gid,   sizeof(entry -> gid),   "%07o", st.st_gid);
     snprintf(entry -> size,  sizeof(entry -> size),  "%011o", (int) st.st_size);
     snprintf(entry -> mtime, sizeof(entry -> mtime), "%011o", (int) st.st_mtime);
-    strncpy(entry -> group, "None", 4);                     // default value
+    strncpy(entry -> group, "None", 5);                     // default value
     memcpy(entry -> ustar, "ustar  \x00", 8);
 
     // figure out filename type and fill in type-specific fields
