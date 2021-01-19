@@ -167,7 +167,7 @@ int write_end_data(const int fd, int size, const char verbosity);
 
 // check if entry is a match for any of the given file names
 // returns index + 1 if match is found
-int check_match(struct tar_t * entry, const size_t filecount, const char * bad, const char * files[]);
+int check_match(struct tar_t * entry, const size_t filecount, const char * files[]);
 // /////////////////////////////////////////////////////////////////////////////
 
 #endif

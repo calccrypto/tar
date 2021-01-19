@@ -17,7 +17,7 @@ $(TARGET): tar.o
 exec: $(TARGET) main.c
 	$(CC) $(CFLAGS) main.c -o exec -ltar -L.
 
-test: exec
+test: exec clean-test
 	@echo "create fake directory entries"
 	@touch file
 	@mkdir folder
@@ -38,6 +38,9 @@ test: exec
 
 	@echo "test archive"
 	@./exec c test.tar file folder pipe sym block char char block sym pipe folder file || (echo "fail" && exit 1)
+
+	@echo "remove nonexistent entry from tarball"
+	@./exec r test.tar nonexistent && (echo "fail" && exit 1) || true
 
 	@echo "remove entries from tarball"
 	@./exec r test.tar folder/ block || (echo "fail" && exit 1)

@@ -311,12 +311,9 @@ int tar_remove(const int fd, struct tar_t ** archive, const size_t filecount, co
 
     // find first file to be removed that does not exist
     int ret = 0;
-    char * bad = calloc(filecount, sizeof(char));
     for(int i = 0; i < filecount; i++){
         if (!exists(*archive, files[i], 0)){
-            V_PRINT(stderr, "Error: '%s' not found in archive", files[i]);
-            bad[i] = 1;
-            ret = -1;
+            ERROR("'%s' not found in archive", files[i]);
         }
     }
 
@@ -334,7 +331,8 @@ int tar_remove(const int fd, struct tar_t ** archive, const size_t filecount, co
                 total += 512 - (total % 512);
             }
         }
-        const int match = check_match(curr, filecount, bad, files);
+
+        const int match = check_match(curr, filecount, files);
 
         if (match < 0){
             ERROR("Match failed");
@@ -1003,7 +1001,7 @@ int write_end_data(const int fd, int size, const char verbosity){
     return pad;
 }
 
-int check_match(struct tar_t * entry, const size_t filecount, const char * bad, const char * files[]){
+int check_match(struct tar_t * entry, const size_t filecount, const char * files[]){
     if (!entry){
         return -1;
     }
@@ -1017,10 +1015,8 @@ int check_match(struct tar_t * entry, const size_t filecount, const char * bad, 
     }
 
     for(size_t i = 0; i < filecount; i++){
-        if (!bad[i]){
-            if (!strncmp(entry -> name, files[i], MAX(strlen(entry -> name), strlen(files[i])) + 1)){
-                return i + 1;
-            }
+        if (!strncmp(entry -> name, files[i], MAX(strlen(entry -> name), strlen(files[i])) + 1)){
+            return i + 1;
         }
     }
 
