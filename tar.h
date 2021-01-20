@@ -41,7 +41,9 @@ THE SOFTWARE
 #include <fcntl.h>
 #include <grp.h>
 #include <pwd.h>
+#if !defined(__APPLE__)
 #include <sys/sysmacros.h>
+#endif
 #include <sys/select.h>
 #include <sys/stat.h>
 #include <sys/time.h>
