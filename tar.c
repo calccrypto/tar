@@ -753,7 +753,7 @@ int extract_entry(const int fd, struct tar_t * entry, const char verbosity){
         }
         free(path);
 
-        if ((entry -> type == REGULAR) || (entry -> type == NORMAL) || (entry -> type == CONTIGUOUS)){
+        {
             // create file
             const unsigned int size = oct2uint(entry -> size, 11);
             int f = open(entry -> name, O_WRONLY | O_CREAT | O_TRUNC, oct2uint(entry -> mode, 7) & 0777);
@@ -784,10 +784,10 @@ int extract_entry(const int fd, struct tar_t * entry, const char verbosity){
 
             close(f);
         }
-        else if ((entry -> type == CHAR) || (entry -> type == BLOCK)){
-            if (mknod(entry -> name, oct2uint(entry -> mode, 7), (oct2uint(entry -> major, 7) << 20) | oct2uint(entry -> minor, 7)) < 0){
-                EXIST_ERROR("Unable to make device %s: %s", entry -> name, strerror(rc));
-            }
+    }
+    else if ((entry -> type == CHAR) || (entry -> type == BLOCK)){
+        if (mknod(entry -> name, oct2uint(entry -> mode, 7), (oct2uint(entry -> major, 7) << 20) | oct2uint(entry -> minor, 7)) < 0){
+            EXIST_ERROR("Unable to make device %s: %s", entry -> name, strerror(rc));
         }
     }
     else if (entry -> type == HARDLINK){
