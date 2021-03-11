@@ -30,7 +30,7 @@ THE SOFTWARE
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 
 int main(int argc, char * argv[]){
-    if (((argc == 2) && (strncmp(argv[1], "help", MAX(strlen(argv[1]), 4)))) && (argc != 3)){
+    if (((argc == 2) && (strncmp(argv[1], "help", MAX(strlen(argv[1]), 4)))) || (argc != 3)){
         fprintf(stderr, "Usage: %s option(s) tarfile [sources]\n", argv[0]);
         fprintf(stderr, "Usage: %s help\n", argv[0]);
         return -1;
