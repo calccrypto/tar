@@ -753,37 +753,35 @@ int extract_entry(const int fd, struct tar_t * entry, const char verbosity){
         }
         free(path);
 
-        {
-            // create file
-            const unsigned int size = oct2uint(entry -> size, 11);
-            int f = open(entry -> name, O_WRONLY | O_CREAT | O_TRUNC, oct2uint(entry -> mode, 7) & 0777);
-            if (f < 0){
-                RC_ERROR("Unable to open file %s: %s", entry -> name, strerror(rc));
-            }
-
-            // move archive pointer to data location
-            if (lseek(fd, 512 + entry -> begin, SEEK_SET) == (off_t) (-1)){
-                RC_ERROR("Bad index: %s", strerror(rc));
-            }
-
-            // copy data to file
-            char buf[512];
-            int got = 0;
-            while (got < size){
-                int r;
-                if ((r = read_size(fd, buf, MIN(size - got, 512))) < 0){
-                    EXIST_ERROR("Unable to read from archive: %s", strerror(rc));
-                }
-
-                if (write(f, buf, r) != r){
-                    EXIST_ERROR("Unable to write to %s: %s", entry -> name, strerror(rc));
-                }
-
-                got += r;
-            }
-
-            close(f);
+        // create file
+        const unsigned int size = oct2uint(entry -> size, 11);
+        int f = open(entry -> name, O_WRONLY | O_CREAT | O_TRUNC, oct2uint(entry -> mode, 7) & 0777);
+        if (f < 0){
+            RC_ERROR("Unable to open file %s: %s", entry -> name, strerror(rc));
         }
+
+        // move archive pointer to data location
+        if (lseek(fd, 512 + entry -> begin, SEEK_SET) == (off_t) (-1)){
+            RC_ERROR("Bad index: %s", strerror(rc));
+        }
+
+        // copy data to file
+        char buf[512];
+        int got = 0;
+        while (got < size){
+            int r;
+            if ((r = read_size(fd, buf, MIN(size - got, 512))) < 0){
+                EXIST_ERROR("Unable to read from archive: %s", strerror(rc));
+            }
+
+            if (write(f, buf, r) != r){
+                EXIST_ERROR("Unable to write to %s: %s", entry -> name, strerror(rc));
+            }
+
+            got += r;
+        }
+
+        close(f);
     }
     else if ((entry -> type == CHAR) || (entry -> type == BLOCK)){
         if (mknod(entry -> name, oct2uint(entry -> mode, 7), (oct2uint(entry -> major, 7) << 20) | oct2uint(entry -> minor, 7)) < 0){
