@@ -14,10 +14,10 @@ env:
     - C_COMPILER=clang-3.8
     - C_COMPILER=clang-3.9
     - C_COMPILER=clang-4.0
-    - C_COMPILER=clang-5.0
-    - C_COMPILER=clang-6.0
-    - C_COMPILER=clang-7
-    - C_COMPILER=clang-8
+    # - C_COMPILER=clang-5.0
+    # - C_COMPILER=clang-6.0
+    # - C_COMPILER=clang-7
+    # - C_COMPILER=clang-8
 
 addons:
   apt:
