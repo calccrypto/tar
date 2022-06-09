@@ -42,7 +42,7 @@ int tar_read(const int fd, struct tar_t ** archive, const char verbosity){
     char update = 1;
 
     for(count = 0; ; count++){
-        *tar = malloc(sizeof(struct tar_t));
+        *tar = calloc(sizeof(struct tar_t));
         if (update && (read_size(fd, (*tar) -> block, 512) != 512)){
             V_PRINT(stderr, "Error: Bad read. Stopping");
             tar_free(*tar);
